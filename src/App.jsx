@@ -17,6 +17,8 @@ const defaultEntries = [
 ]
 
 
+const ENTRY_TYPES = ["character", "location", "faction", "term"];
+
 const [entries, setEntries] = useState(() => {
   const raw = localStorage.getItem("codexEntries:v1");
   return raw ? JSON.parse(raw) : defaultEntries;
@@ -31,7 +33,47 @@ useEffect(() => {
 }, [entries]);
 
 
+function createEntry(type = "term") {
+  const id = crypto.randomUUID();
 
+  const newEntry = {
+    id,
+    type,
+    name: "Untitled",
+    summary: "",
+  };
+
+  setEntries((prev) => [newEntry, ...prev]);
+  setSelectedID(id);
+}
+
+function updateEntry(id, patch) {
+  setEntries((prev) =>
+    prev.map((e) => (e.id === id ? { ...e, ...patch } : e))
+  );
+}
+
+
+function exportJSON() {
+  const payload = {
+    schemaVersion: 1,
+    exportedAt: new Date().toISOString(),
+    entries,
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {
+    type: "application/json",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `worldbuilders-codex-${new Date()
+    .toISOString()
+    .slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 
 
@@ -51,44 +93,85 @@ useEffect(() => {
                 className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
               />
             </div>
+
+
+                                  <div className="mb-3 flex items-center justify-between gap-2">
+                        <div className="text-sm font-medium text-slate-700">Entries</div>
+
+                        <button
+                          onClick={() => createEntry("term")}
+                          className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-slate-50 hover:bg-slate-800"
+                        >
+                          + New
+                        </button>
+                      </div>
+
+                          <button
+                           onClick={exportJSON}
+                           className="rounded-md border border-slate-300 bg-white/70 px-2 py-1 text-xs font-semibold text-slate-800 hover:bg-white"
+                            >
+                              Export
+                           </button>
             
-                {["character", "location", "faction"].map((type) => (
-              <div key={type} className="mb-4">
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                  {type}s
-                </h2>
-                <ul className="space-y-1">
-                  {entries
-                    .filter((e) => e.type === type)
-                    .map((e) => (
-                      <li
-                        key={e.id}
-                        onClick={() => setSelectedID(e.id)}
-                        className={`cursor-pointer rounded-md px-2 py-1 hover:bg-slate-200/60 ${
-                          selectedID === e.id ? "bg-slate-200/80 font-medium" : ""
-                        }`}
-                      >
-                        {e.name}
-                      </li>
+                                    {ENTRY_TYPES.map((type) => (
+                      <div key={type} className="mb-4">
+                        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                          {type}s
+                        </h2>
+
+                        <ul className="space-y-1">
+                          {entries
+                            .filter((e) => e.type === type)
+                            .map((e) => (
+                              <li
+                                key={e.id}
+                                onClick={() => setSelectedID(e.id)}
+                                className={`cursor-pointer rounded-md px-2 py-1 hover:bg-slate-200/60 ${
+                                  selectedID === e.id ? "bg-slate-200/80 font-medium" : ""
+                                }`}
+                              >
+                                {e.name}
+                              </li>
+                            ))}
+                        </ul>
+                      </div>
                     ))}
-                </ul>
-              </div>
-            ))}
 
 
           </aside>
 
-          <main className="col-span-12 md:col-span-8 rounded-xl border border-slate-300 bg-white/60 p-3">
-           {selected ? (
-                  <div>
-                    <div className="text-xs uppercase tracking-wide text-slate-600">{selected.type}</div>
-                    <h2 className="text-2xl font-semibold">{selected.name}</h2>
-                    <p className="mt-2 text-slate-700">{selected.summary}</p>
-                  </div>
-                ) : (
-                  <div className="text-slate-600">Select an entry</div>
-                )}
-          </main>
+         <main className="col-span-12 md:col-span-8 rounded-xl border border-slate-300 bg-white/60 p-4">
+  {selected ? (
+    <div className="space-y-3">
+      <div className="text-xs uppercase tracking-wide text-slate-600">
+        {selected.type}
+      </div>
+
+      <input
+        className="w-full rounded-lg border border-slate-300 bg-white/80 px-3 py-2 text-2xl font-semibold outline-none focus:border-slate-400"
+        value={selected.name}
+        onChange={(ev) => updateEntry(selected.id, { name: ev.target.value })}
+      />
+
+      <textarea
+        className="w-full rounded-lg border border-slate-300 bg-white/80 px-3 py-2 text-slate-800 outline-none focus:border-slate-400"
+        rows={6}
+        placeholder="Summary…"
+        value={selected.summary}
+        onChange={(ev) =>
+          updateEntry(selected.id, { summary: ev.target.value })
+        }
+      />
+
+      <div className="text-xs text-slate-500">
+        Autosaved locally
+      </div>
+    </div>
+  ) : (
+    <div className="text-slate-600">Select an entry</div>
+  )}
+</main>
+
         </div>
       </div>
     </div>
