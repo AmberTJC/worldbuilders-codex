@@ -75,6 +75,50 @@ function exportJSON() {
   URL.revokeObjectURL(url);
 }
 
+function importJSONFromFile(file) {
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    try {
+      const text = reader.result;
+      const data = JSON.parse(String(text));
+
+      // Accept either { entries: [...] } or just [...]
+      const incomingEntries = Array.isArray(data) ? data : data?.entries;
+      if (!Array.isArray(incomingEntries)) {
+        alert("Import failed: JSON must be an array of entries or an object with an 'entries' array.");
+        return;
+      }
+
+      // Light validation / normalization
+      const normalized = incomingEntries
+        .filter((e) => e && e.id && e.type && typeof e.name === "string")
+        .map((e) => ({
+          id: e.id,
+          type: e.type,
+          name: e.name,
+          summary: typeof e.summary === "string" ? e.summary : "",
+        }));
+      if (normalized.length === 0) {
+        alert("Import failed: No valid entries found.");
+        return;
+      }
+
+      const ok = confirm(
+        `Import ${normalized.length} entries?\n\nOK = Replace current entries\nCancel = Do nothing`
+      );
+      if (!ok) return;
+
+      setEntries(normalized);
+      setSelectedID(normalized[0]?.id ?? null);
+    } catch (err) {
+      console.error(err);
+      alert("Import failed: invalid JSON.");
+    }
+  };
+
+  reader.readAsText(file);
+}
 
 
   return (
@@ -112,6 +156,33 @@ function exportJSON() {
                             >
                               Export
                            </button>
+
+
+                                                  <input
+                              type="file"
+                              accept="application/json"
+                              id="import-json"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                importJSONFromFile(file);
+
+                                // allow re-importing the same file later
+                                e.target.value = "";
+                              }}
+                            />
+
+                            <button
+                              onClick={() => document.getElementById("import-json")?.click()}
+                              className="rounded-md border border-slate-300 bg-white/70 px-2 py-1 text-xs font-semibold text-slate-800 hover:bg-white"
+                            >
+                              Import
+                            </button>
+
+
+
+
             
                                     {ENTRY_TYPES.map((type) => (
                       <div key={type} className="mb-4">
