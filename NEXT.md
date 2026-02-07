@@ -16,3 +16,4 @@ Next tiny step (5–10 min): Add a “New Entry” button (creates a new entry +
 Add “Edit mode” for name/summary (inputs bound to selected entry)
 Save edits to localStorage (should already happen via entries state)
 Add Export JSON / Import JSON
+New entry bug fixed with dropdown

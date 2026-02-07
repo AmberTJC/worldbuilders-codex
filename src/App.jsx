@@ -18,6 +18,7 @@ const defaultEntries = [
 
 
 const ENTRY_TYPES = ["character", "location", "faction", "term"];
+const [newEntryType, setNewEntryType] = useState("term");
 
 const [entries, setEntries] = useState(() => {
   const raw = localStorage.getItem("codexEntries:v1");
@@ -142,12 +143,28 @@ function importJSONFromFile(file) {
                                   <div className="mb-3 flex items-center justify-between gap-2">
                         <div className="text-sm font-medium text-slate-700">Entries</div>
 
-                        <button
-                          onClick={() => createEntry("term")}
-                          className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-slate-50 hover:bg-slate-800"
-                        >
-                          + New
-                        </button>
+
+                        <div className="flex items-center gap-2">
+                            <select
+                              value={newEntryType}
+                              onChange={(e) => setNewEntryType(e.target.value)}
+                              className="rounded-md border border-slate-300 bg-white/70 px-2 py-1 text-xs text-slate-800"
+                            >
+                             {ENTRY_TYPES.map((t) => (
+                              <option key={t} value={t}>
+                                {t[0].toUpperCase() + t.slice(1)}
+                              </option>
+                            ))}
+                            </select>
+
+                            <button
+                              onClick={() => createEntry(newEntryType)}
+                              className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-slate-50 hover:bg-slate-800"
+                            >
+                              + New
+                            </button>
+                          </div>
+
                       </div>
 
                           <button
