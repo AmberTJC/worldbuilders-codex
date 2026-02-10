@@ -26,7 +26,7 @@ const [entries, setEntries] = useState(() => {
 });
 
 const [selectedID, setSelectedID] = useState(entries[0]?.id ?? null);
-const selected = entries.find(e => e.id === selectedID);
+const selected = entries.find((e) => e.id === selectedID) ?? null;
 
 
 useEffect(() => {
@@ -53,6 +53,42 @@ function updateEntry(id, patch) {
     prev.map((e) => (e.id === id ? { ...e, ...patch } : e))
   );
 }
+
+function deleteEntry(id) {
+  const entry = entries.find((e) => e.id === id);
+  if (!entry) return;
+
+  const ok = window.confirm(
+    `Delete "${entry.name || "Untitled"}" (${entry.type})?\n\nThis cannot be undone.`
+  );
+  if (!ok) return;
+
+  // Precompute a sensible next selection BEFORE it is removed
+  const sameType = entries.filter((e) => e.type === entry.type);
+  const idxInType = sameType.findIndex((e) => e.id === id);
+
+  const nextInType =
+    idxInType >= 0 ? sameType[idxInType + 1]?.id ?? null : null;
+  const prevInType =
+    idxInType > 0 ? sameType[idxInType - 1]?.id ?? null : null;
+
+  // Remove entry
+  setEntries((prev) => prev.filter((e) => e.id !== id));
+
+  // Update selection
+  if (selectedID === id) {
+    const remaining = entries.filter((e) => e.id !== id);
+    const fallback =
+      nextInType ??
+      prevInType ??
+      remaining[0]?.id ??
+      null;
+
+    setSelectedID(fallback);
+  }
+}
+
+
 
 
 function exportJSON() {
@@ -167,6 +203,18 @@ function importJSONFromFile(file) {
 
                       </div>
 
+
+                          <button
+                            onClick={() => selectedID && deleteEntry(selectedID)}
+                            disabled={!selectedID}
+                            className="rounded-md border border-rose-300 bg-white/70 px-2 py-1 text-xs font-semibold text-rose-700 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            Delete
+                          </button>
+
+
+
+
                           <button
                            onClick={exportJSON}
                            className="rounded-md border border-slate-300 bg-white/70 px-2 py-1 text-xs font-semibold text-slate-800 hover:bg-white"
@@ -259,6 +307,12 @@ function importJSONFromFile(file) {
     <div className="text-slate-600">Select an entry</div>
   )}
 </main>
+
+
+          <div className="text-slate-600">
+            {entries.length === 0 ? "No entries yet. Create one!" : "Select an entry"}
+          </div>
+
 
         </div>
       </div>

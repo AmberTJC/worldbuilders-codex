@@ -1,5 +1,5 @@
 
-Add Delete entry (with confirm)
+
 
 Add Tags (chips) + filter
 Optional polish: parchment theme + icons per type
@@ -17,3 +17,4 @@ Add “Edit mode” for name/summary (inputs bound to selected entry)
 Save edits to localStorage (should already happen via entries state)
 Add Export JSON / Import JSON
 New entry bug fixed with dropdown
+Add Delete entry (with confirm)
