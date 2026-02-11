@@ -2,18 +2,15 @@ import { useEffect, useState } from 'react'
 import './App.css'
 
 
-
-
-
 export default function App() {
 
 
 
 const defaultEntries = [
-  { id: 1, type: "character", name: "Sidriel", summary: "A quiet political architect with a fondness for crystal butterflies" },
-  { id: 2, type: "character", name: "Isarion", summary: "Elder dragon in human guise; cold, brash, loyal."},
-  { id: 3, type: "location", name: "Warden's Rest", summary: "A sunlit glade that feels fae-adjacent and safe." },
-  { id: 4, type: "faction", name: "The Church", summary: "Radiance doctrine; inquisitions; moral authority as control."}
+  { id: 1, type: "character", name: "Sidriel", summary: "A quiet political architect with a fondness for crystal butterflies", tags: [] },
+  { id: 2, type: "character", name: "Isarion", summary: "Elder dragon in human guise; cold, brash, loyal.", tags: [] },
+  { id: 3, type: "location", name: "Warden's Rest", summary: "A sunlit glade that feels fae-adjacent and safe.", tags: [] },
+  { id: 4, type: "faction", name: "The Church", summary: "Radiance doctrine; inquisitions; moral authority as control.", tags: [] }
 ]
 
 
@@ -28,31 +25,35 @@ const [entries, setEntries] = useState(() => {
 const [selectedID, setSelectedID] = useState(entries[0]?.id ?? null);
 const selected = entries.find((e) => e.id === selectedID) ?? null;
 
+const [tagInput, setTagInput] = useState("");
+
 
 useEffect(() => {
   localStorage.setItem("codexEntries:v1", JSON.stringify(entries));
 }, [entries]);
 
+// One-time normalize: ensure tags exists on all entries (old saves won't have it)
+useEffect(() => {
+  setEntries((prev) =>
+    prev.map((e) => ({
+      ...e,
+      tags: Array.isArray(e.tags) ? e.tags : [],
+    }))
+  );
+}, []);
 
 function createEntry(type = "term") {
   const id = crypto.randomUUID();
-
-  const newEntry = {
-    id,
-    type,
-    name: "Untitled",
-    summary: "",
-  };
-
+  const newEntry = { id, type, name: "Untitled", summary: "", tags: [] };
   setEntries((prev) => [newEntry, ...prev]);
   setSelectedID(id);
 }
-
 function updateEntry(id, patch) {
   setEntries((prev) =>
     prev.map((e) => (e.id === id ? { ...e, ...patch } : e))
   );
 }
+
 
 function deleteEntry(id) {
   const entry = entries.find((e) => e.id === id);
@@ -135,6 +136,7 @@ function importJSONFromFile(file) {
           type: e.type,
           name: e.name,
           summary: typeof e.summary === "string" ? e.summary : "",
+          tags: Array.isArray(e.tags) ? e.tags : [],
         }));
       if (normalized.length === 0) {
         alert("Import failed: No valid entries found.");
@@ -157,6 +159,49 @@ function importJSONFromFile(file) {
   reader.readAsText(file);
 }
 
+
+function normalizeTag(raw) {
+  let t = String(raw ?? "").trim().toLowerCase();
+  if (!t) return "";
+
+  //treat spaces/underscores as dashes
+  t = t.replace(/[\s_]+/g, "-");
+
+  // keep only a-z 0-9 and -
+  t = t.replace(/[^a-z0-9-]/g, "");
+
+  // collapse multiple dashes
+ t = t.replace(/-+/g, "-");
+
+  // trim dashes on ends
+  t = t.replace(/^-+|-+$/g, "");
+
+  return t;
+}
+
+function addTag(entryId, rawTag) {
+  const tag = normalizeTag(rawTag);
+  if (!tag) return;
+
+  setEntries((prev) =>
+    prev.map((e) => {
+      if (e.id !== entryId) return e;
+       const tags = Array.isArray(e.tags) ? e.tags : [];
+      if (tags.includes(tag)) return e;
+      return { ...e, tags: [...tags, tag] };
+    })
+  );
+}
+
+function removeTag(entryId, tag) {
+  setEntries((prev) =>
+    prev.map((e) => {
+      if (e.id !== entryId) return e;
+      const tags = Array.isArray(e.tags) ? e.tags : [];
+      return { ...e, tags: tags.filter((t) => t !== tag) };
+    })
+  );
+}
 
   return (
     
@@ -298,15 +343,51 @@ function importJSONFromFile(file) {
           updateEntry(selected.id, { summary: ev.target.value })
         }
       />
+            {/* Tags */}
+<div className="space-y-2">
+  <div className="text-xs font-medium text-slate-700">Tags</div>
 
-      <div className="text-xs text-slate-500">
-        Autosaved locally
-      </div>
-    </div>
-  ) : (
-    <div className="text-slate-600">Select an entry</div>
-  )}
-</main>
+  <div className="flex flex-wrap gap-2">
+    {(selected.tags ?? []).map((t) => (
+      <button
+        key={t}
+        type="button"
+        onClick={() => removeTag(selected.id, t)}
+        className="flex items-center gap-2 rounded-full border border-slate-300 bg-white/80 px-3 py-1 text-xs text-slate-800 hover:bg-slate-100"
+        title="Remove tag"
+      >
+        <span>{t}</span>
+        <span className="text-slate-500">×</span>
+      </button>
+    ))}
+    {(selected.tags ?? []).length === 0 && (
+      <div className="text-xs text-slate-500">No tags yet</div>
+    )}
+  </div>
+
+  <input
+    className="w-full rounded-lg border border-slate-300 bg-white/80 px-3 py-2 text-sm outline-none focus:border-slate-400"
+    placeholder="Add tag (letters/numbers/-), press Enter…"
+    value={tagInput}
+    onChange={(e) => setTagInput(e.target.value)}
+    onKeyDown={(e) => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      addTag(selected.id, tagInput);
+      setTagInput("");
+    }}
+  />
+</div>
+
+                  <div className="text-xs text-slate-500">
+                    
+                    Autosaved locally
+                  </div>
+                </div>
+              ) : (
+                <div className="text-slate-600">Select an entry</div>
+              )}
+            </main>
 
 
           <div className="text-slate-600">
