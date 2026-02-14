@@ -27,6 +27,8 @@ const selected = entries.find((e) => e.id === selectedID) ?? null;
 
 const [tagInput, setTagInput] = useState("");
 
+const [query, setQuery] = useState("");
+
 
 useEffect(() => {
   localStorage.setItem("codexEntries:v1", JSON.stringify(entries));
@@ -203,6 +205,24 @@ function removeTag(entryId, tag) {
   );
 }
 
+
+
+const q = query.trim().toLowerCase();
+const hasQuery = q.length > 0;
+
+function entryMatches(e) {
+  if (!hasQuery) return true;
+  const name = String(e.name ?? "").toLowerCase();
+  if (name.includes(q)) return true;
+
+  const tags = Array.isArray(e.tags) ? e.tags : [];
+  return tags.some((t) => String(t).toLowerCase().includes(q));
+}
+
+const matchedEntries = entries.filter(entryMatches);
+const hasResults = matchedEntries.length > 0;
+
+
   return (
     
     <div className="min-h-screen bg-[#f4efe6] text-slate-900">
@@ -215,9 +235,12 @@ function removeTag(entryId, tag) {
         <div className="grid grid-cols-12 gap-4">
           <aside className="col-span-12 md:col-span-4 rounded-xl border border-slate-300 bg-white/60 p-3">
             <div className="mb-3">
-              <input  placeholder="Search…"
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
-              />
+              <input
+          placeholder="Search… (name or tag)"
+          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
             </div>
 
 
@@ -293,30 +316,44 @@ function removeTag(entryId, tag) {
 
 
 
-            
-                                    {ENTRY_TYPES.map((type) => (
-                      <div key={type} className="mb-4">
-                        <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
-                          {type}s
-                        </h2>
 
-                        <ul className="space-y-1">
-                          {entries
-                            .filter((e) => e.type === type)
-                            .map((e) => (
-                              <li
-                                key={e.id}
-                                onClick={() => setSelectedID(e.id)}
-                                className={`cursor-pointer rounded-md px-2 py-1 hover:bg-slate-200/60 ${
-                                  selectedID === e.id ? "bg-slate-200/80 font-medium" : ""
-                                }`}
-                              >
-                                {e.name}
-                              </li>
-                            ))}
-                        </ul>
-                      </div>
-                    ))}
+
+              {hasQuery && !hasResults && (
+                <div className="mb-3 rounded-md border border-slate-300 bg-white/70 px-2 py-2 text-xs text-slate-600">
+                  No results for “{query.trim()}”.
+                </div>
+              )}
+
+              {ENTRY_TYPES.map((type) => {
+                const items = entries
+                  .filter((e) => e.type === type)
+                  .filter(entryMatches);
+
+                // Polished behavior: hide empty groups while searching
+                if (hasQuery && items.length === 0) return null;
+
+                return (
+                  <div key={type} className="mb-4">
+                    <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                      {type}s
+                    </h2>
+
+                    <ul className="space-y-1">
+                      {items.map((e) => (
+                        <li
+                          key={e.id}
+                          onClick={() => setSelectedID(e.id)}
+                          className={`cursor-pointer rounded-md px-2 py-1 hover:bg-slate-200/60 ${
+                            selectedID === e.id ? "bg-slate-200/80 font-medium" : ""
+                          }`}
+                        >
+                          {e.name}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
 
 
           </aside>
