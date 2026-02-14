@@ -329,7 +329,7 @@ const hasResults = matchedEntries.length > 0;
 
                 return (
                   <div key={type} className="mb-4">
-                    <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                    <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-slate-700">
                       {type}s
                     </h2>
 
