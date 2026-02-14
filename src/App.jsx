@@ -272,49 +272,44 @@ const hasResults = matchedEntries.length > 0;
                       </div>
 
 
-                          <button
-                            onClick={() => selectedID && deleteEntry(selectedID)}
-                            disabled={!selectedID}
-                            className="rounded-md border border-rose-300 bg-white/70 px-2 py-1 text-xs font-semibold text-rose-700 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            Delete
-                          </button>
+                      <div className="mb-3 flex flex-wrap items-center gap-2">
+                        <button
+                          onClick={() => selectedID && deleteEntry(selectedID)}
+                          disabled={!selectedID}
+                          className="rounded-md border border-rose-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-rose-700 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          Delete
+                        </button>
 
+                        <button
+                          onClick={exportJSON}
+                          className="rounded-md border border-slate-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-white"
+                        >
+                          Export
+                        </button>
 
+                        <input
+                          type="file"
+                          accept="application/json"
+                          id="import-json"
+                          className="hidden"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            importJSONFromFile(file);
 
+                            // allow re-importing the same file later
+                            e.target.value = "";
+                          }}
+                        />
 
-                          <button
-                           onClick={exportJSON}
-                           className="rounded-md border border-slate-300 bg-white/70 px-2 py-1 text-xs font-semibold text-slate-800 hover:bg-white"
-                            >
-                              Export
-                           </button>
-
-
-                                                  <input
-                              type="file"
-                              accept="application/json"
-                              id="import-json"
-                              className="hidden"
-                              onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (!file) return;
-                                importJSONFromFile(file);
-
-                                // allow re-importing the same file later
-                                e.target.value = "";
-                              }}
-                            />
-
-                            <button
-                              onClick={() => document.getElementById("import-json")?.click()}
-                              className="rounded-md border border-slate-300 bg-white/70 px-2 py-1 text-xs font-semibold text-slate-800 hover:bg-white"
-                            >
-                              Import
-                            </button>
-
-
-
+                        <button
+                          onClick={() => document.getElementById("import-json")?.click()}
+                          className="rounded-md border border-slate-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-white"
+                        >
+                          Import
+                        </button>
+                      </div>
 
 
 
@@ -390,7 +385,7 @@ const hasResults = matchedEntries.length > 0;
         key={t}
         type="button"
         onClick={() => removeTag(selected.id, t)}
-        className="flex items-center gap-2 rounded-full border border-slate-300 bg-white/80 px-3 py-1 text-xs text-slate-800 hover:bg-slate-100"
+        className="flex items-center gap-2 rounded-full border border-slate-300 bg-white/80 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
         title="Remove tag"
       >
         <span>{t}</span>
