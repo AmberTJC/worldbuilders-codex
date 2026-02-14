@@ -244,72 +244,67 @@ const hasResults = matchedEntries.length > 0;
             </div>
 
 
-                                  <div className="mb-3 flex items-center justify-between gap-2">
-                        <div className="text-sm font-medium text-slate-700">Entries</div>
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="text-sm font-medium text-slate-700">Entries</div>
 
+              <div className="flex flex-wrap items-center gap-2">
+                <select
+                  value={newEntryType}
+                  onChange={(e) => setNewEntryType(e.target.value)}
+                  className="rounded-md border border-slate-300 bg-white/70 px-2 py-1 text-xs text-slate-800"
+                >
+                  {ENTRY_TYPES.map((t) => (
+                    <option key={t} value={t}>
+                      {t[0].toUpperCase() + t.slice(1)}
+                    </option>
+                  ))}
+                </select>
 
-                        <div className="flex items-center gap-2">
-                            <select
-                              value={newEntryType}
-                              onChange={(e) => setNewEntryType(e.target.value)}
-                              className="rounded-md border border-slate-300 bg-white/70 px-2 py-1 text-xs text-slate-800"
-                            >
-                             {ENTRY_TYPES.map((t) => (
-                              <option key={t} value={t}>
-                                {t[0].toUpperCase() + t.slice(1)}
-                              </option>
-                            ))}
-                            </select>
+                <button
+                  onClick={() => createEntry(newEntryType)}
+                  className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-slate-50 hover:bg-slate-800"
+                >
+                  + New
+                </button>
 
-                            <button
-                              onClick={() => createEntry(newEntryType)}
-                              className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-slate-50 hover:bg-slate-800"
-                            >
-                              + New
-                            </button>
-                          </div>
+                <button
+                  onClick={() => selectedID && deleteEntry(selectedID)}
+                  disabled={!selectedID}
+                  className="rounded-md border border-rose-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-rose-700 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Delete
+                </button>
 
-                      </div>
+                <button
+                  onClick={exportJSON}
+                  className="rounded-md border border-slate-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-white"
+                >
+                  Export
+                </button>
 
+                <input
+                  type="file"
+                  accept="application/json"
+                  id="import-json"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    importJSONFromFile(file);
 
-                      <div className="mb-3 flex flex-wrap items-center gap-2">
-                        <button
-                          onClick={() => selectedID && deleteEntry(selectedID)}
-                          disabled={!selectedID}
-                          className="rounded-md border border-rose-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-rose-700 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          Delete
-                        </button>
+                    // allow re-importing the same file later
+                    e.target.value = "";
+                  }}
+                />
 
-                        <button
-                          onClick={exportJSON}
-                          className="rounded-md border border-slate-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-white"
-                        >
-                          Export
-                        </button>
-
-                        <input
-                          type="file"
-                          accept="application/json"
-                          id="import-json"
-                          className="hidden"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (!file) return;
-                            importJSONFromFile(file);
-
-                            // allow re-importing the same file later
-                            e.target.value = "";
-                          }}
-                        />
-
-                        <button
-                          onClick={() => document.getElementById("import-json")?.click()}
-                          className="rounded-md border border-slate-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-white"
-                        >
-                          Import
-                        </button>
-                      </div>
+                <button
+                  onClick={() => document.getElementById("import-json")?.click()}
+                  className="rounded-md border border-slate-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-white"
+                >
+                  Import
+                </button>
+              </div>
+            </div>
 
 
 
