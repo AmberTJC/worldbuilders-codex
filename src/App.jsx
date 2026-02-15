@@ -1,5 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
+
+import iconCharacter from "./assets/icons/Characters_Mask.png";
+import iconFaction from "./assets/icons/Factions_Shield.png";
+import iconLocation from "./assets/icons/Location_MapPin.png";
+import iconTerm from "./assets/icons/Terms_book.png";
+
+import iconTrash from "./assets/icons/Trash.png";
+import iconSearch from "./assets/icons/Search.png";
+import iconNew from "./assets/icons/New.png";
+import iconImport from "./assets/icons/Import.png";
+import iconExport from "./assets/icons/Export.png";
 
 
 export default function App() {
@@ -210,6 +221,13 @@ function removeTag(entryId, tag) {
 const q = query.trim().toLowerCase();
 const hasQuery = q.length > 0;
 
+const typeIcon = useMemo(() => ({
+  character: iconCharacter,
+  location: iconLocation,
+  faction: iconFaction,
+  term: iconTerm,
+}), []);
+
 function entryMatches(e) {
   if (!hasQuery) return true;
   const name = String(e.name ?? "").toLowerCase();
@@ -235,12 +253,19 @@ const hasResults = matchedEntries.length > 0;
         <div className="grid grid-cols-12 gap-4">
           <aside className="col-span-12 md:col-span-4 rounded-xl border border-slate-300 bg-white/60 p-3">
             <div className="mb-3">
-              <input
-          placeholder="Search… (name or tag)"
-          className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+              <div className="relative">
+                <img
+                  src={iconSearch}
+                  alt=""
+                  className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 opacity-70"
+                />
+                <input
+                  placeholder="Search… (name or tag)"
+                  className="w-full rounded-lg border border-slate-300 bg-white py-2 pl-10 pr-3 text-sm"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
             </div>
 
 
@@ -264,9 +289,10 @@ const hasResults = matchedEntries.length > 0;
 
                   <button
                     onClick={() => createEntry(newEntryType)}
-                    className="rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-slate-50 hover:bg-slate-800"
+                    className="inline-flex items-center gap-2 rounded-md bg-slate-900 px-2 py-1 text-xs font-semibold text-slate-50 hover:bg-slate-800"
                   >
-                    + New
+                    <img src={iconNew} alt="" className="h-[18px] w-[18px] opacity-95" />
+                    <span>New</span>
                   </button>
                 </div>
 
@@ -278,16 +304,18 @@ const hasResults = matchedEntries.length > 0;
                   <button
                     onClick={() => selectedID && deleteEntry(selectedID)}
                     disabled={!selectedID}
-                    className="rounded-md border border-rose-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-rose-700 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-md border border-rose-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-rose-700 hover:bg-white disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    Delete
+                    <img src={iconTrash} alt="" className="h-[18px] w-[18px] opacity-80" />
+                    <span>Delete</span>
                   </button>
 
                   <button
                     onClick={exportJSON}
-                    className="rounded-md border border-slate-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-white"
+                    className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-white"
                   >
-                    Export
+                    <img src={iconExport} alt="" className="h-[18px] w-[18px] opacity-80" />
+                    <span>Export</span>
                   </button>
 
                   <input
@@ -307,9 +335,10 @@ const hasResults = matchedEntries.length > 0;
 
                   <button
                     onClick={() => document.getElementById("import-json")?.click()}
-                    className="rounded-md border border-slate-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-white"
+                    className="inline-flex items-center gap-2 rounded-md border border-slate-300 bg-white/70 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-white"
                   >
-                    Import
+                    <img src={iconImport} alt="" className="h-[18px] w-[18px] opacity-80" />
+                    <span>Import</span>
                   </button>
                 </div>
               </div>
@@ -333,8 +362,13 @@ const hasResults = matchedEntries.length > 0;
 
                 return (
                   <div key={type} className="mb-4">
-                    <h2 className="mb-2 text-sm font-bold uppercase tracking-wide text-slate-700">
-                      {type}s
+                    <h2 className="mb-2 flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-slate-700">
+                      <img
+                        src={typeIcon[type]}
+                        alt=""
+                        className="h-[18px] w-[18px] opacity-80"
+                      />
+                      <span>{type}s</span>
                     </h2>
 
                     <ul className="space-y-1">
