@@ -385,16 +385,28 @@ const hasResults = matchedEntries.length > 0;
 
   <div className="flex flex-wrap gap-2">
     {(selected.tags ?? []).map((t) => (
-      <button
+      <div
         key={t}
-        type="button"
-        onClick={() => removeTag(selected.id, t)}
-        className="flex items-center gap-2 rounded-full border border-slate-300 bg-white/80 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
-        title="Remove tag"
+        className="flex items-center gap-1 rounded-full border border-slate-300 bg-white/80 px-2 py-1 text-sm font-medium text-slate-700"
       >
-        <span>{t}</span>
-        <span className="text-slate-500">×</span>
-      </button>
+        <button
+          type="button"
+          onClick={() => setQuery(t)}
+          className="px-1 hover:text-slate-900"
+          title="Search this tag"
+        >
+          {t}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => removeTag(selected.id, t)}
+          className="rounded-full px-1 text-slate-500 hover:bg-slate-200/60 hover:text-slate-700"
+          title="Remove tag"
+        >
+          ×
+        </button>
+      </div>
     ))}
     {(selected.tags ?? []).length === 0 && (
       <div className="text-xs text-slate-500">No tags yet</div>
