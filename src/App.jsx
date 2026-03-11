@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 
 import iconCharacter from "./assets/icons/Characters_Mask.png";
@@ -40,10 +40,28 @@ const [tagInput, setTagInput] = useState("");
 
 const [query, setQuery] = useState("");
 
+const editorRef = useRef(null);
 
 useEffect(() => {
   localStorage.setItem("codexEntries:v1", JSON.stringify(entries));
 }, [entries]);
+
+// UX: when selecting an entry from the sidebar (especially when scrolled down),
+// scroll the editor into view.
+useEffect(() => {
+  if (!selectedID) return;
+
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+  requestAnimationFrame(() => {
+    editorRef.current?.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  });
+}, [selectedID]);
 
 // One-time normalize: ensure tags exists on all entries (old saves won't have it)
 useEffect(() => {
@@ -391,7 +409,7 @@ const hasResults = matchedEntries.length > 0;
 
           </aside>
 
-         <main className="col-span-12 md:col-span-8 rounded-xl border border-slate-300 bg-white/60 p-4">
+         <main ref={editorRef} className="col-span-12 md:col-span-8 rounded-xl border border-slate-300 bg-white/60 p-4">
   {selected ? (
     <div className="space-y-3">
       <div className="text-xs uppercase tracking-wide text-slate-600">
