@@ -1,16 +1,45 @@
-# React + Vite
+Worldbuilder’s Codex
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+A lightweight, offline-first codex for worldbuilding: store and organize key terms, characters, locations, factions, and more for writing projects.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Built as a fast, low-friction place to capture lore while writing—no account, no backend, no fuss.
 
-## React Compiler
+Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Expanding the ESLint configuration
+Create, edit, and delete codex entries with type-based organization (e.g., Characters, Locations, Factions)
+Tagging to cross-categorize entries
+Search + filter to quickly find what you need
+Grouped navigation for browsing by entry type
+Local persistence via localStorage
+JSON import/export with a versioned schema, validation, and clear error messages
+Safety-focused UX touches (e.g., safe delete + reselection behavior)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Tech Stack
+
+
+React
+Vite
+JavaScript
+Tailwind CSS (v4)
+
+Screenshots:
+
+
+
+Getting Started (Local)
+
+
+npm install
+
+npm run dev
+
+Import / Export Notes
+
+
+Export creates a JSON file containing your codex data.
+Import validates the file before applying changes and provides user-friendly error messages if something’s wrong.
+
+
+
