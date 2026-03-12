@@ -26,6 +26,22 @@ Tailwind CSS (v4)
 
 Screenshots:
 
+Main Screen
+<img width="1164" height="923" alt="image" src="https://github.com/user-attachments/assets/0c81a117-bbb3-44cf-af06-b2c0299dbfe3" />
+
+
+Editor
+
+<img width="732" height="408" alt="image" src="https://github.com/user-attachments/assets/259b9499-6a7c-4b69-9687-aa748b719003" />
+
+
+Tag Search
+
+<img width="382" height="531" alt="image" src="https://github.com/user-attachments/assets/6f784e22-ed05-42c0-92b6-4ac355a6f079" />
+
+
+
+
 
 
 Getting Started (Local)
